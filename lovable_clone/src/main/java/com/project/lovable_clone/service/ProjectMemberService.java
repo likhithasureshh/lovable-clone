@@ -5,7 +5,7 @@ import com.project.lovable_clone.dto.member.MemberResponse;
 import com.project.lovable_clone.dto.member.UpdateMemberRoleRequest;
 import org.springframework.stereotype.Service;
 
-@Service
+
 public interface ProjectMemberService {
     MemberResponse getProjectMembers(Long projectId, Long userId);
 

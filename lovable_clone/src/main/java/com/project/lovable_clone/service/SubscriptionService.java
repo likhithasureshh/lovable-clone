@@ -6,7 +6,7 @@ import com.project.lovable_clone.dto.subscription.PortalResponse;
 import com.project.lovable_clone.dto.subscription.SubscriptionResponse;
 import org.springframework.stereotype.Service;
 
-@Service
+
 public interface SubscriptionService {
     SubscriptionResponse getCurrentSubscription(Long userId);
 

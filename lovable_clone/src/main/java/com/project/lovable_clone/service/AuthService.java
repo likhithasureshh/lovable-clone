@@ -5,7 +5,7 @@ import com.project.lovable_clone.dto.auth.LoginRequest;
 import com.project.lovable_clone.dto.auth.SignupRequest;
 import org.springframework.stereotype.Service;
 
-@Service
+
 public interface AuthService {
     AuthResponse signup(SignupRequest signupRequest);
 

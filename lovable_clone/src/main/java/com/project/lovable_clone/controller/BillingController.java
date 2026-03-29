@@ -19,7 +19,7 @@ public class BillingController {
     @GetMapping("/plans")
     public ResponseEntity<PlanResponse> getAllPlans()
     {
-        return ResponseEntity.ok(planService.gtAllActivePlans());
+        return ResponseEntity.ok(planService.getAllActivePlans());
     }
 
     @GetMapping(path = "/me/subscription")

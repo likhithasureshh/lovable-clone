@@ -1,3 +1,21 @@
 spring:
   application:
     name: lovable_clone
+
+  datasource:
+    url:  jdbc:postgresql://localhost:9000/lovable-clone-test?options=-c%20TimeZone=Asia/Kolkata
+    username: postgres
+    password: Li@180803
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          timezone: Asia/Kolkata
+
