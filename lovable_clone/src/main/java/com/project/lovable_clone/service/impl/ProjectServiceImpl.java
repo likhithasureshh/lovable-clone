@@ -13,19 +13,28 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import com.project.lovable_clone.entity.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true,level = AccessLevel.PRIVATE)
+@Transactional
 public class ProjectServiceImpl implements ProjectService {
 
     ProjectRepository projectRepository;
     ProjectMapper projectMapper;
     UserRepository userRepository;
     @Override
-    public ProjectSummaryResponse getUserProjects(Long userId)
+    public List<ProjectSummaryResponse> getUserProjects(Long userId)
     {
-        return null;
+//        return projectRepository.findAllAccessibleByUser(userId)
+//                .stream()
+//                .map(project -> projectMapper.toProjectSummaryResponse(project))
+//                .collect(Collectors.toList());
+        return projectMapper.toListProjectSummaryResponse(projectRepository.findAllAccessibleByUser(userId));
     }
 
     @Override

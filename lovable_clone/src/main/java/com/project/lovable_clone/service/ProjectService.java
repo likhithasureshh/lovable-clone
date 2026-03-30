@@ -7,9 +7,11 @@ import com.project.lovable_clone.dto.project.ProjectResponse;
 import com.project.lovable_clone.dto.project.ProjectSummaryResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 public interface ProjectService {
-    ProjectSummaryResponse getUserProjects(Long userId);
+    List<ProjectSummaryResponse> getUserProjects(Long userId);
 
     ProjectResponse getUserProjectById(Long id, Long userId);
 

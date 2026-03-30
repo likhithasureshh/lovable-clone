@@ -2,15 +2,18 @@ package com.project.lovable_clone.mapper;
 
 import com.project.lovable_clone.dto.auth.UserProfileResponse;
 import com.project.lovable_clone.dto.project.ProjectResponse;
+import com.project.lovable_clone.dto.project.ProjectSummaryResponse;
 import com.project.lovable_clone.entity.Project;
 import com.project.lovable_clone.entity.User;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-03-30T00:18:32+0530",
+    date = "2026-03-30T22:04:48+0530",
     comments = "version: 1.6.0, compiler: javac, environment: Java 21.0.10 (Oracle Corporation)"
 )
 @Component
@@ -37,6 +40,41 @@ public class ProjectMapperImpl implements ProjectMapper {
         ProjectResponse projectResponse = new ProjectResponse( id, name, createdAt, updatedAt, owner );
 
         return projectResponse;
+    }
+
+    @Override
+    public ProjectSummaryResponse toProjectSummaryResponse(Project project) {
+        if ( project == null ) {
+            return null;
+        }
+
+        Long id = null;
+        String name = null;
+        Instant createdAt = null;
+        Instant updatedAt = null;
+
+        id = project.getId();
+        name = project.getName();
+        createdAt = project.getCreatedAt();
+        updatedAt = project.getUpdatedAt();
+
+        ProjectSummaryResponse projectSummaryResponse = new ProjectSummaryResponse( id, name, createdAt, updatedAt );
+
+        return projectSummaryResponse;
+    }
+
+    @Override
+    public List<ProjectSummaryResponse> toListProjectSummaryResponse(List<Project> projects) {
+        if ( projects == null ) {
+            return null;
+        }
+
+        List<ProjectSummaryResponse> list = new ArrayList<ProjectSummaryResponse>( projects.size() );
+        for ( Project project : projects ) {
+            list.add( toProjectSummaryResponse( project ) );
+        }
+
+        return list;
     }
 
     protected UserProfileResponse userToUserProfileResponse(User user) {
