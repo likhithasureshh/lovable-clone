@@ -15,6 +15,7 @@ import com.project.lovable_clone.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,8 +39,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectResponse getUserProjectById(Long id, Long userId) {
-        return null;
+    public ProjectResponse getUserProjectById(Long id, Long userId)
+    {
+        Project project = getFindAccessibleByProjectId(id,userId);
+        return projectMapper.toProjectResponse(project);
     }
 
     @Override
@@ -57,12 +60,32 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectResponse updateProject(Long id, ProjectRequest projectRequest, Long userId) {
-        return null;
+    public ProjectResponse updateProject(Long id, ProjectRequest projectRequest, Long userId)
+    {
+        Project project = getFindAccessibleByProjectId(id,userId);
+        if(!project.getOwner().getId().equals(userId))
+        {
+            throw new RuntimeException("You are not allowed to update the name");
+        }
+        project.setName(projectRequest.name());
+        projectRepository.save(project);
+        return projectMapper.toProjectResponse(project);
     }
 
     @Override
-    public void softDelete(Long id, Long userId) {
+    public void softDelete(Long id, Long userId)
+    {
+      Project project = getFindAccessibleByProjectId(id,userId);
+      if(!project.getOwner().getId().equals(userId))
+      {
+          throw new RuntimeException("You are not allowed to delete the project");
+      }
+      project.setDeletedAt(Instant.now());
+      projectRepository.save(project);
+    }
 
+    public Project getFindAccessibleByProjectId(Long projectId,Long userId)
+    {
+        return projectRepository.findAccessibleProjectById(projectId,userId).orElseThrow();
     }
 }
