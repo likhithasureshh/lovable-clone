@@ -4,8 +4,10 @@ import com.application.lovable_clone.dto.project.ProjectRequest;
 import com.application.lovable_clone.dto.project.ProjectResponse;
 import com.application.lovable_clone.dto.project.ProjectSummaryResponse;
 
+import java.util.List;
+
 public interface ProjectService {
-    ProjectSummaryResponse getUserProjects(Long userId);
+    List<ProjectSummaryResponse> getUserProjects(Long userId);
 
     ProjectResponse getUserProjectsById(Long id, Long userId);
 
