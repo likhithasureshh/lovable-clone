@@ -9,7 +9,7 @@ public record MemberResponse(
         String name,
         String email,
         String avatarUrl,
-        ProjectRole role,
+        ProjectRole projectRole,
         Instant invitedAt
 ) {
 }
