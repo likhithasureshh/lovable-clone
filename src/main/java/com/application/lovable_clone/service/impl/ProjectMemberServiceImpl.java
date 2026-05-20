@@ -32,24 +32,19 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     @Override
     public List<MemberResponse> getAllProjectMembers(Long projectId, Long userId) {
-        List<MemberResponse> memberResponses = new ArrayList<>();
+
         Project project = getAccessibleByProjectId(projectId,userId);
-        memberResponses.add(projectMemberMapper.toMemberResponseFromOwner(project.getOwner()));
-        memberResponses.addAll(projectMemberRepository.findByIdProjectId(projectId)
+        return projectMemberRepository.findByIdProjectId(projectId)
                 .stream()
                 .map(projectMember -> projectMemberMapper.toMemberResponseFromInvite(projectMember))
-                .toList());
-        return memberResponses;
+                .toList();
     }
 
     @Override
     public MemberResponse inviteMember(Long projectId, InviteMemberRequest inviteMemberRequest, Long userId) {
         Project project = getAccessibleByProjectId(projectId,userId);
-        if(!project.getOwner().getId().equals(userId))
-        {
-            throw new RuntimeException("You can not allowed to invite!");
-        }
-        User invitee = userRepository.findByEmail(inviteMemberRequest.email());
+
+        User invitee = userRepository.findByUsername(inviteMemberRequest.username()).orElseThrow();
 
         if(invitee.getId().equals(userId))
         {
@@ -76,10 +71,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     public MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request, Long userId) {
         Project project = getAccessibleByProjectId(projectId,userId);
-        if(!project.getOwner().getId().equals(userId))
-        {
-            throw new RuntimeException("You are not allowed to update the role");
-        }
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId,memberId);
         ProjectMember projectMember = projectMemberRepository.findById(projectMemberId).orElseThrow();
         projectMember.setProjectRole(request.role());
@@ -90,10 +81,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     public void removeProjectMember(Long projectId, Long memberId, Long userId) {
         Project project = getAccessibleByProjectId(projectId,userId);
-        if(!project.getOwner().getId().equals(userId))
-        {
-            throw new RuntimeException("You are not allowed to delete the member");
-        }
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId,memberId);
         if(!projectMemberRepository.existsById(projectMemberId))
         {

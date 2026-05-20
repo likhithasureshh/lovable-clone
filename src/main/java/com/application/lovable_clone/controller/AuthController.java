@@ -6,6 +6,7 @@ import com.application.lovable_clone.dto.auth.SignUpRequest;
 import com.application.lovable_clone.dto.auth.UserProfileResponse;
 import com.application.lovable_clone.service.AuthService;
 import com.application.lovable_clone.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +20,13 @@ public class AuthController {
 
 
     @PostMapping("/signUp")
-    public ResponseEntity<AuthResponse> signUp(@RequestBody SignUpRequest signUpRequest)
+    public ResponseEntity<AuthResponse> signUp(@RequestBody @Valid SignUpRequest signUpRequest)
     {
         return ResponseEntity.ok(authService.signUp(signUpRequest));
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest)
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest loginRequest)
     {
         return ResponseEntity.ok(authService.login(loginRequest));
     }
