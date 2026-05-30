@@ -6,8 +6,12 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.service.spi.InjectService;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
@@ -16,7 +20,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
      @Id
      @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,5 +41,8 @@ public class User {
      Instant deletedAt;
 
 
-
+     @Override
+     public Collection<? extends GrantedAuthority> getAuthorities() {
+          return List.of();
+     }
 }

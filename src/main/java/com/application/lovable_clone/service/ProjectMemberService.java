@@ -7,11 +7,11 @@ import com.application.lovable_clone.dto.member.UpdateMemberRoleRequest;
 import java.util.List;
 
 public interface ProjectMemberService {
-    List<MemberResponse> getAllProjectMembers(Long projectId, Long userId);
+    List<MemberResponse> getAllProjectMembers(Long projectId);
 
-    MemberResponse inviteMember(Long projectId, InviteMemberRequest inviteMemberRequest, Long userId);
+    MemberResponse inviteMember(Long projectId, InviteMemberRequest inviteMemberRequest);
 
-    MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request, Long userId);
+    MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request);
 
-    void removeProjectMember(Long projectId, Long memberId, Long userId);
+    void removeProjectMember(Long projectId, Long memberId);
 }

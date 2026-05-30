@@ -11,6 +11,7 @@ import com.application.lovable_clone.mapper.ProjectMemberMapper;
 import com.application.lovable_clone.repository.ProjectMemberRepository;
 import com.application.lovable_clone.repository.ProjectRepository;
 import com.application.lovable_clone.repository.UserRepository;
+import com.application.lovable_clone.security.AuthUtil.AuthUtil;
 import com.application.lovable_clone.service.ProjectMemberService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +30,11 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     ProjectMemberRepository projectMemberRepository;
     ProjectMemberMapper projectMemberMapper;
     UserRepository userRepository;
+    AuthUtil authUtil;
 
     @Override
-    public List<MemberResponse> getAllProjectMembers(Long projectId, Long userId) {
-
+    public List<MemberResponse> getAllProjectMembers(Long projectId) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleByProjectId(projectId,userId);
         return projectMemberRepository.findByIdProjectId(projectId)
                 .stream()
@@ -41,7 +43,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public MemberResponse inviteMember(Long projectId, InviteMemberRequest inviteMemberRequest, Long userId) {
+    public MemberResponse inviteMember(Long projectId, InviteMemberRequest inviteMemberRequest) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleByProjectId(projectId,userId);
 
         User invitee = userRepository.findByUsername(inviteMemberRequest.username()).orElseThrow();
@@ -69,7 +72,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request, Long userId) {
+    public MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleByProjectId(projectId,userId);
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId,memberId);
         ProjectMember projectMember = projectMemberRepository.findById(projectMemberId).orElseThrow();
@@ -79,7 +83,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public void removeProjectMember(Long projectId, Long memberId, Long userId) {
+    public void removeProjectMember(Long projectId, Long memberId) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleByProjectId(projectId,userId);
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId,memberId);
         if(!projectMemberRepository.existsById(projectMemberId))
