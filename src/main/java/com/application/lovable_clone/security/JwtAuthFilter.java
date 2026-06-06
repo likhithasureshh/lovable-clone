@@ -22,7 +22,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("request:{}",request.getRequestURI());
         String requestToken = request.getHeader("Authorization");
-        if(requestToken==null || !requestToken.startsWith("Bearer "))
+        if(requestToken==null || !requestToken.startsWith("Bearer"))
         {
             filterChain.doFilter(request,response);
             return;
