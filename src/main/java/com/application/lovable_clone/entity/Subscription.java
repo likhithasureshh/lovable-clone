@@ -19,7 +19,6 @@ public class Subscription {
     User user;
     Plan plan;
     String stripeSubscriptionId;
-    String stripeCustomerId;
     Instant currentPeriodStart;
     Instant currentPeriodEnd;
     Boolean cancelAtPeriodEnd;
