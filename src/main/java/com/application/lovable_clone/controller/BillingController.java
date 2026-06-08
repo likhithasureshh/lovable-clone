@@ -1,9 +1,6 @@
 package com.application.lovable_clone.controller;
 
-import com.application.lovable_clone.dto.subscription.CheckOutResponse;
-import com.application.lovable_clone.dto.subscription.CheckoutRequest;
-import com.application.lovable_clone.dto.subscription.PlanResponse;
-import com.application.lovable_clone.dto.subscription.PortalResponse;
+import com.application.lovable_clone.dto.subscription.*;
 import com.application.lovable_clone.service.PaymentProcessor;
 import com.application.lovable_clone.service.PlanService;
 import com.application.lovable_clone.service.SubscriptionService;
@@ -42,10 +39,9 @@ public class BillingController {
     }
 
     @GetMapping(path = "/api/me/subscription")
-    public ResponseEntity<SubscriptionService> getCurrentSubscription()
+    public ResponseEntity<SubscriptionResponse> getCurrentSubscription()
     {
-        Long userId = 1L;
-        return ResponseEntity.ok(subscriptionService.getCurrentSubscription(userId));
+        return ResponseEntity.ok(subscriptionService.getCurrentSubscription());
     }
 
     @PostMapping(path = "/api/payment/checkout")
@@ -59,8 +55,7 @@ public class BillingController {
     @PostMapping(path = "/api/payment/portal")
     public ResponseEntity<PortalResponse> openCustomerPortal()
     {
-        Long userId = 1L;
-        return ResponseEntity.ok(paymentProcessor.openCustomerPortal(userId));
+        return ResponseEntity.ok(paymentProcessor.openCustomerPortal());
     }
 
     @PostMapping(path = "webhook/payments")
