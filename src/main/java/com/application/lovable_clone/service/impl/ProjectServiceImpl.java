@@ -8,6 +8,7 @@ import com.application.lovable_clone.entity.ProjectMember;
 import com.application.lovable_clone.entity.ProjectMemberId;
 import com.application.lovable_clone.entity.User;
 import com.application.lovable_clone.enums.ProjectRole;
+import com.application.lovable_clone.errors.BadRequestException;
 import com.application.lovable_clone.errors.ResourceNotFoundException;
 import com.application.lovable_clone.mapper.ProjectMapper;
 import com.application.lovable_clone.repository.ProjectMemberRepository;
@@ -15,6 +16,7 @@ import com.application.lovable_clone.repository.ProjectRepository;
 import com.application.lovable_clone.repository.UserRepository;
 import com.application.lovable_clone.security.AuthUtil.AuthUtil;
 import com.application.lovable_clone.service.ProjectService;
+import com.application.lovable_clone.service.SubscriptionService;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ public class ProjectServiceImpl implements ProjectService {
     UserRepository userRepository;
     ProjectMapper projectMapper;
     ProjectMemberRepository projectMemberRepository;
+    SubscriptionService subscriptionService;
     AuthUtil authUtil;
 
     @Override
@@ -53,6 +56,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectResponse createProject(ProjectRequest projectRequest) {
+
+        if(!subscriptionService.canCreateProjects())
+        {
+            throw new BadRequestException("You have reached your limit for porject creation.Please upgrade");
+        }
         Long userId = authUtil.getCurrentUserId();
         User owner = userRepository.findById(userId).orElseThrow();
         Project project = Project.builder()

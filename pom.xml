@@ -170,6 +170,11 @@
 						</configuration>
 					</execution>
 				</executions>
+				<configuration>
+					<source>26</source>
+					<target>26</target>
+					<compilerArgs>--enable-preview</compilerArgs>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

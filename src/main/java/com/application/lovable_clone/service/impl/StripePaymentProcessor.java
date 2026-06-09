@@ -79,8 +79,23 @@ public class StripePaymentProcessor implements PaymentProcessor {
     }
 
     @Override
-    public PortalResponse openCustomerPortal() {
-        return null;
+    public PortalResponse openCustomerPortal()
+    {
+       Long userId = authUtil.getCurrentUserId();
+       User user = getUser(userId);
+       String stripeCustomerId = user.getStripeCustomerId();
+        try {
+            var sessions = com.stripe.model.billingportal.Session.create(
+                    com.stripe.param.billingportal.SessionCreateParams
+                            .builder()
+                            .setCustomer(stripeCustomerId)
+                            .setReturnUrl(clientUrl)
+                            .build()
+            );
+            return new PortalResponse(sessions.getUrl());
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -173,7 +188,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
             case "active"->SubscriptionStatus.ACTIVE;
             case "trailing"->SubscriptionStatus.TRAILING;
             case "past_due","unpaid","paused","incomplete_expired"->SubscriptionStatus.PAST_DUE;
-            case "cancelled"->SubscriptionStatus.CANCELLED;
+            case "canceled"->SubscriptionStatus.CANCELLED;
             case "incomplete"->SubscriptionStatus.INCOMPLETE;
             default -> {
                 log.debug("Invalid subscription status");
@@ -212,7 +227,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
     }
     private Plan resolvePlanId(Price stripePriceId)
     {
-       return planRepository.findByStripePriceId(stripePriceId).orElse(null);
+       return  planRepository.findByStripePriceId(stripePriceId.getId()).orElse(null);
     }
 
 
