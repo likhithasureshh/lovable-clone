@@ -1,0 +1,18 @@
+package com.project.lovable_clone.service;
+
+import com.project.lovable_clone.dto.project.ProjectRequest;
+import com.project.lovable_clone.dto.project.ProjectResponse;
+import com.project.lovable_clone.dto.project.ProjectSummaryResponse;
+
+public interface ProjectService {
+    ProjectSummaryResponse getUserProjects(Long userId);
+
+    ProjectResponse getUserProjectsById(Long id, Long userId);
+
+    ProjectResponse createProject(ProjectRequest request, Long userId);
+
+    ProjectResponse updateProjectById(Long id, ProjectRequest request, Long userId);
+
+
+    void softDelete(Long id, Long userId);
+}
