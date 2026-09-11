@@ -7,6 +7,7 @@ import com.project.lovable_clone.entity.Project;
 import com.project.lovable_clone.entity.ProjectMember;
 import com.project.lovable_clone.entity.ProjectMemberId;
 import com.project.lovable_clone.entity.User;
+import com.project.lovable_clone.errors.ResourceNotFoundException;
 import com.project.lovable_clone.mapper.ProjectMapper;
 import com.project.lovable_clone.mapper.ProjectMemberMapper;
 import com.project.lovable_clone.repository.ProjectMemberRepository;
@@ -34,25 +35,18 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     public List<MemberResponse> getProjectMembers(Long projectId, Long userId) {
         Project project = getAccessibleUserProjectById(projectId,userId);
-        List<MemberResponse> memberResponseList = new ArrayList<>();
-        memberResponseList.add(projectMemberMapper.toMemberResponseFromUser(project.getOwner()));
-        memberResponseList.addAll(
-                projectMemberRepository.findByIdProjectId(projectId).stream()
+
+        return projectMemberRepository.findByIdProjectId(projectId).stream()
                         .map(projectMemberMapper::toMemberResponseFromProjectMember)
-                        .collect(Collectors.toList())
-        );
-        return memberResponseList;
+                        .collect(Collectors.toList());
     }
 
     @Override
     public MemberResponse inviteProjectMember(Long projectId, InviteMemberRequest request, Long userId)
     {
         Project project = getAccessibleUserProjectById(projectId,userId);
-        if(!project.getOwner().getId().equals(userId))
-        {
-            throw new RuntimeException("You cannot invitee");
-        }
-        User invitee = userRepository.findByEmail(request.email()).orElseThrow();
+        User invitee = userRepository.findByUsername(request.username())
+                .orElseThrow(()-> new ResourceNotFoundException("user",userId.toString()));
         if(invitee.getId().equals(userId))
         {
             throw new RuntimeException("You cannot invite yourself!");
@@ -77,10 +71,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     public MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request, Long userId)
     {
         Project project = getAccessibleUserProjectById(projectId,userId);
-        if(!project.getOwner().getId().equals(userId))
-        {
-            throw new RuntimeException("You are not allowed to Update Role!");
-        }
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId,memberId);
         ProjectMember projectMember = projectMemberRepository.findById(projectMemberId).orElseThrow();
         projectMember.setProjectRole(request.projectRole());
@@ -92,16 +82,13 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     public void removeProjectMember(Long projectId, Long memberId, Long userId) {
         Project project = getAccessibleUserProjectById(projectId,userId);
-        if(!project.getOwner().getId().equals(userId))
-        {
-            throw new RuntimeException("You are not allowed to Reomve the Project Member");
-        }
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId,memberId);
         projectMemberRepository.deleteById(projectMemberId);
     }
 
     public Project getAccessibleUserProjectById(Long projectId, Long userId)
     {
-        return projectRepository.findAccessibleUserProjectById(projectId,userId).orElseThrow();
+        return projectRepository.findAccessibleUserProjectById(projectId,userId)
+                .orElseThrow(()-> new ResourceNotFoundException("project",projectId.toString()));
     }
 }
