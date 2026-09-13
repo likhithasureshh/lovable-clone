@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,18 +25,21 @@ public class ProjectController {
     }
 
     @GetMapping(path = "/{id}")
+    @PreAuthorize("@security.canViewProject(#id)")
     public ResponseEntity<ProjectResponse> getProjectById(@PathVariable Long id)
     {
         return ResponseEntity.ok(projectService.getUserProjectsById(id));
     }
 
     @PostMapping
+
     public ResponseEntity<ProjectResponse> createProject(@RequestBody @Valid ProjectRequest request)
     {
         return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request));
     }
 
     @PatchMapping(path = "/{id}")
+    @PreAuthorize("@security.canEditProject(#id)")
     public ResponseEntity<ProjectResponse> updateProjectById(@PathVariable Long id,
                                                              @RequestBody @Valid ProjectRequest request)
     {
@@ -43,6 +47,7 @@ public class ProjectController {
     }
 
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("@security.canDeleteProject(#id)")
     public ResponseEntity<Void> deleteProjectById(@PathVariable Long id)
     {
         projectService.softDelete(id);
