@@ -1,8 +1,12 @@
 package com.project.lovable_clone.errors;
 
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -45,5 +49,31 @@ public class GlobalExceptionHandler {
         log.error(String.valueOf(apiError),exception);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(apiError);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    private ResponseEntity<ApiError> handleJwtException(JwtException exception)
+    {
+        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED,exception.getLocalizedMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    private ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException exception)
+    {
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN,exception.getLocalizedMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiError);
+    }
+    @ExceptionHandler(UsernameNotFoundException.class)
+    private ResponseEntity<ApiError> handleUsernameNotFoundException(UsernameNotFoundException exception)
+    {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND,exception.getLocalizedMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+    @ExceptionHandler(AuthenticationException.class)
+    private ResponseEntity<ApiError> handleAuthenticationException(UsernameNotFoundException exception)
+    {
+        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED,exception.getLocalizedMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
     }
 }

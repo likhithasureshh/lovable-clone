@@ -8,7 +8,5 @@ import com.project.lovable_clone.dto.subscription.SubscriptionResponse;
 public interface SubscriptionService {
     SubscriptionResponse getMySubscription(Long userId);
 
-    CheckOutResponse createCheckOutUrl(CheckOutRequest request, Long userId);
 
-    PortalResponse getCustomerPortalUrl(Long userId);
 }
