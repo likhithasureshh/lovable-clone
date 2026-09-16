@@ -42,8 +42,7 @@ public class BillingController {
     @GetMapping("/api/me/subscription")
     public ResponseEntity<SubscriptionResponse> getMySubscription()
     {
-        Long userId = 1L;
-        return ResponseEntity.ok(subscriptionService.getMySubscription(userId));
+        return ResponseEntity.ok(subscriptionService.getMySubscription());
     }
 
     @PostMapping("/api/payments/checkout")

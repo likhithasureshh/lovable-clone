@@ -8,6 +8,7 @@ import com.project.lovable_clone.entity.ProjectMember;
 import com.project.lovable_clone.entity.ProjectMemberId;
 import com.project.lovable_clone.entity.User;
 import com.project.lovable_clone.enums.ProjectRole;
+import com.project.lovable_clone.errors.BadRequestException;
 import com.project.lovable_clone.errors.ResourceNotFoundException;
 import com.project.lovable_clone.mapper.ProjectMapper;
 import com.project.lovable_clone.repository.ProjectMemberRepository;
@@ -15,6 +16,7 @@ import com.project.lovable_clone.repository.ProjectRepository;
 import com.project.lovable_clone.repository.UserRepository;
 import com.project.lovable_clone.security.AuthUtil;
 import com.project.lovable_clone.service.ProjectService;
+import com.project.lovable_clone.service.SubscriptionService;
 import com.project.lovable_clone.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -35,9 +37,14 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectMapper projectMapper;
     ProjectMemberRepository projectMemberRepository;
     AuthUtil authUtil;
+    SubscriptionService subscriptionService;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
+        if(!subscriptionService.canCreateNewProjects())
+        {
+            throw new BadRequestException("You cannot create the project with this Plan,Upgrade Now!");
+        }
         Long userId = authUtil.getCurrentUserId();
         //User owner = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("user",userId.toString()));
         User owner = userRepository.getReferenceById(userId);
