@@ -2,6 +2,8 @@ package com.project.lovable_clone.service.impl;
 
 import com.project.lovable_clone.entity.ProjectFile;
 import com.project.lovable_clone.llm.PromptUtils;
+import com.project.lovable_clone.llm.advisors.FileTreeAdvisor;
+import com.project.lovable_clone.llm.tools.CodeGenerationTool;
 import com.project.lovable_clone.security.AuthUtil;
 import com.project.lovable_clone.service.AiGenerationService;
 import com.project.lovable_clone.service.ProjectFileService;
@@ -27,6 +29,7 @@ public class AiGenerationServiceImpl implements AiGenerationService {
     private final AuthUtil authUtil;
     private static final Pattern FILE_TAG_PATTERN = Pattern.compile("<file path=\"([^\"]+)\">(.*?)</file>", Pattern.DOTALL);
     private final ProjectFileService projectFileService;
+    private final FileTreeAdvisor fileTreeAdvisor;
 
     @Override
     @PreAuthorize("@security.canEditProject(#projectId)")
@@ -37,18 +40,26 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                 "userId",userId,
                     "projectId",projectId
         );
+        CodeGenerationTool codeGenerationTool = new CodeGenerationTool(projectFileService,projectId);
         StringBuilder fullResponseBuffer = new StringBuilder();
 
         return chatClient.prompt()
                 .system(PromptUtils.CODE_GENERATION_SYSTEM_PROMPT)
                 .user(userMessage)
+                .tools(codeGenerationTool)
                 .advisors(advisorSpec -> {
                     advisorSpec.params(advisorParams);
+                    advisorSpec.advisors(fileTreeAdvisor);
                 })
                 .stream()
                 .chatResponse()
                 .doOnNext(response->
                 {
+                    if (response == null || response.getResult() == null) {
+                        log.warn("Received ChatResponse without result: {}", response);
+                        return;
+                    }
+                    log.info("ChatResponse = {}", response);
                     String content = response.getResult().getOutput().getText();
                     fullResponseBuffer.append(content);
                 })
@@ -59,7 +70,17 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                     });
                 })
                 .doOnError(response-> log.error("Error Ocurred while streaming the response for project{}",projectId,response))
-                .map(response -> Objects.requireNonNull(response.getResult()).getOutput().getText());
+                //.map(response -> response.getResult().getOutput().getText())
+                .handle((resp, sink) -> {
+                    var result = resp != null ? resp.getResult() : null;
+                    var output = result != null ? result.getOutput() : null;
+                    var text   = output != null ? output.getText() : null;
+
+                    if (text != null && !text.isEmpty()) {
+                        sink.next(text);
+                    }
+                    // else: ignore non-text events
+                });
 
     }
 
