@@ -46,11 +46,11 @@ public class AiGenerationServiceImpl implements AiGenerationService {
         return chatClient.prompt()
                 .system(PromptUtils.CODE_GENERATION_SYSTEM_PROMPT)
                 .user(userMessage)
-                .tools(codeGenerationTool)
                 .advisors(advisorSpec -> {
                     advisorSpec.params(advisorParams);
                     advisorSpec.advisors(fileTreeAdvisor);
                 })
+                .tools(codeGenerationTool)
                 .stream()
                 .chatResponse()
                 .doOnNext(response->
@@ -68,8 +68,9 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                     {
                         parseAndSaveFiles(fullResponseBuffer.toString(),projectId);
                     });
+                    log.info("Final output :{}",fullResponseBuffer.toString());
                 })
-                .doOnError(response-> log.error("Error Ocurred while streaming the response for project{}",projectId,response))
+                .doOnError(response-> log.error("Error Occurred while streaming the response for project{}",projectId,response))
                 //.map(response -> response.getResult().getOutput().getText())
                 .handle((resp, sink) -> {
                     var result = resp != null ? resp.getResult() : null;
