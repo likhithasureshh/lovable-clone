@@ -7,6 +7,8 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -29,7 +31,10 @@ public class ChatMessage {
             )
     ChatSession chatSession;
 
-    @Column(columnDefinition = "text",nullable = false)
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL,mappedBy = "chatMessage")
+    List<ChatEvent> events;
+
+    @Column(columnDefinition = "text")
     String content;
 
     @Enumerated(EnumType.STRING)

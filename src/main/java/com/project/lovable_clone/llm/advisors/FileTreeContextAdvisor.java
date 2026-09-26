@@ -23,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FileTreeAdvisor implements StreamAdvisor {
+public class FileTreeContextAdvisor implements StreamAdvisor {
     private final ProjectFileService projectFileService;
     @Override
     public Flux<ChatClientResponse> adviseStream(ChatClientRequest chatClientRequest, StreamAdvisorChain streamAdvisorChain) {
@@ -67,7 +67,7 @@ public class FileTreeAdvisor implements StreamAdvisor {
 
     @Override
     public String getName() {
-        return "FileTreeAdvisor";
+        return "fileTreeContextAdvisor";
     }
 
     @Override
