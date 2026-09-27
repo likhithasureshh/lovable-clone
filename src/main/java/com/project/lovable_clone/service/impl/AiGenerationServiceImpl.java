@@ -1,5 +1,7 @@
 package com.project.lovable_clone.service.impl;
 
+
+import com.project.lovable_clone.dto.chat.StreamResponse;
 import com.project.lovable_clone.entity.*;
 import com.project.lovable_clone.enums.ChatEventType;
 import com.project.lovable_clone.enums.MessageRole;
@@ -44,7 +46,7 @@ public class AiGenerationServiceImpl implements AiGenerationService {
 
     @Override
     @PreAuthorize("@security.canEditProject(#projectId)")
-    public Flux<String> streamResponse(String userMessage, Long projectId) {
+    public Flux<StreamResponse> streamResponseFromLLM(String userMessage, Long projectId) {
          Long userId = authUtil.getCurrentUserId();
          ChatSession chatSession =canCreateChatSessionIfNotExists(userId,projectId);
         Map<String,Object> advisorParams = Map.of(
@@ -73,13 +75,14 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                         log.warn("Received ChatResponse without result: {}", response);
                         return;
                     }
-                    log.info("ChatResponse = {}", response);
                     String content = response.getResult().getOutput().getText();
                     if(content!= null && !content.isEmpty() && endTime.get() == 0)
                     {
                         endTime.set(System.currentTimeMillis());
                     }
-                    fullResponseBuffer.append(content);
+                    if(content != null) {
+                        fullResponseBuffer.append(content);
+                    }
                 })
                 .doOnComplete(()->{
                     Schedulers.boundedElastic().schedule(()->
@@ -91,18 +94,13 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                     log.info("Final output :{}",fullResponseBuffer.toString());
                 })
                 .doOnError(response-> log.error("Error Occurred while streaming the response for project{}",projectId,response))
-                //.map(response -> response.getResult().getOutput().getText())
-                .handle((resp, sink) -> {
-                    var result = resp != null ? resp.getResult() : null;
-                    var output = result != null ? result.getOutput() : null;
-                    var text   = output != null ? output.getText() : null;
-
-                    if (text != null && !text.isEmpty()) {
-                        sink.next(text);
-                    }
-                    // else: ignore non-text events
-                });
-
+                // Final OpenAI chunk carries usage only (generations=[]), so getResult() is null -> drop it.
+                .filter(response -> response != null && response.getResult() != null)
+                .map(response -> {
+                    String text = response.getResult().getOutput().getText();
+                    return new StreamResponse(text != null ? text : "");
+                })
+                .filter(streamResponse -> !streamResponse.text().isEmpty());
     }
 
 

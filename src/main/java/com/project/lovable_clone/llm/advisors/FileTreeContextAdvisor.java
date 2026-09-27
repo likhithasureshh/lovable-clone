@@ -43,7 +43,7 @@ public class FileTreeContextAdvisor implements StreamAdvisor {
                 .orElse(null);
 
         List<Message> userMessage = message.stream()
-                .filter(m -> m.getMessageType() == MessageType.USER)
+                .filter(m -> m.getMessageType() != MessageType.SYSTEM)
                 .toList();
 
         List<Message> allMessages = new ArrayList<>();
