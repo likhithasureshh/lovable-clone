@@ -1,5 +1,6 @@
 package com.project.lovable_clone.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.lovable_clone.enums.ChatEventType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,8 +21,9 @@ public class ChatEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
+    @JsonIgnore
     ChatMessage chatMessage;
 
     @Enumerated(EnumType.STRING)

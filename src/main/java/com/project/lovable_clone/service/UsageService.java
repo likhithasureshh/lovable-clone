@@ -4,7 +4,6 @@ import com.project.lovable_clone.dto.subscription.PlanLimitsResponse;
 import com.project.lovable_clone.dto.subscription.UsageTodayResponse;
 
 public interface UsageService {
-    UsageTodayResponse getUsageToday(Long userId);
-
-    PlanLimitsResponse getCurrentSubscriptionLimitsForTheUser(Long userId);
+   void recordTokensUsage(Long userId,int actualTokens);
+   void checkDailyTokenUsage();
 }

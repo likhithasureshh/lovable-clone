@@ -8,7 +8,6 @@ import com.project.lovable_clone.entity.ProjectMember;
 import com.project.lovable_clone.entity.ProjectMemberId;
 import com.project.lovable_clone.entity.User;
 import com.project.lovable_clone.errors.ResourceNotFoundException;
-import com.project.lovable_clone.mapper.ProjectMapper;
 import com.project.lovable_clone.mapper.ProjectMemberMapper;
 import com.project.lovable_clone.repository.ProjectMemberRepository;
 import com.project.lovable_clone.repository.ProjectRepository;
@@ -21,7 +20,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,7 +60,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         }
         ProjectMember projectMember = ProjectMember.builder()
                 .id(projectMemberId)
-                .projectRole(request.projectRole())
+                .projectRole(request.role())
                 .invitedAt(Instant.now())
                 .user(invitee)
                 .project(project)
@@ -78,7 +76,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         Project project = getAccessibleUserProjectById(projectId,userId);
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId,memberId);
         ProjectMember projectMember = projectMemberRepository.findById(projectMemberId).orElseThrow();
-        projectMember.setProjectRole(request.projectRole());
+        projectMember.setProjectRole(request.role());
         projectMember=projectMemberRepository.save(projectMember);
 
         return projectMemberMapper.toMemberResponseFromProjectMember(projectMember);

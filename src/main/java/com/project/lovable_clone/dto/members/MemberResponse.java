@@ -8,6 +8,6 @@ public record MemberResponse(
         String username,
         String avatarUrl,
         String invitedAt,
-        ProjectRole projectRole
+        ProjectRole role
 ) {
 }

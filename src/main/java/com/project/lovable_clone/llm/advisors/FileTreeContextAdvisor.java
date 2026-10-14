@@ -2,6 +2,7 @@ package com.project.lovable_clone.llm.advisors;
 
 
 import com.project.lovable_clone.dto.project.FileNode;
+import com.project.lovable_clone.dto.project.FileTreeResponse;
 import com.project.lovable_clone.service.ProjectFileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class FileTreeContextAdvisor implements StreamAdvisor {
         }
 
 
-        List<FileNode> fileNodeList = projectFileService.getFileTree(projectId);
+        List<FileNode> fileNodeList = projectFileService.getFileTree(projectId).files();
         String fileTreeContext = "\n\n ---- FILE_TREE ----\n\n"+fileNodeList.toString();
         allMessages.add(new SystemMessage(fileTreeContext));
 

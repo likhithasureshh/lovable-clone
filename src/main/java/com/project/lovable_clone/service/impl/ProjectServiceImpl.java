@@ -18,7 +18,6 @@ import com.project.lovable_clone.security.AuthUtil;
 import com.project.lovable_clone.service.ProjectService;
 import com.project.lovable_clone.service.ProjectTemplateService;
 import com.project.lovable_clone.service.SubscriptionService;
-import com.project.lovable_clone.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -75,15 +75,19 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectSummaryResponse> getUserProjects() {
         Long userId = authUtil.getCurrentUserId();
-        List<Project> projectList = projectRepository.findAllAccessibleByUser(userId);
-        return projectMapper.toProjectSummaryResponse(projectList);
+        var projectWithRoles1 = projectRepository.findAllAccessibleByUser(userId);
+        return projectWithRoles1.stream()
+                .map(projectWithRoles-> projectMapper.
+                        toProjectSummaryResponse(projectWithRoles.getProject(),projectWithRoles.getRole()))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public ProjectResponse getUserProjectsById(Long id) {
+    public ProjectSummaryResponse getUserProjectsById(Long id) {
         Long userId = authUtil.getCurrentUserId();
-        Project project = getAccessibleUserProjectById(id, userId);
-        return projectMapper.toProjectResponse(project);
+        var projectWithRole = projectRepository.findAccessibleUserProjectByIdWithRole(id,userId)
+                .orElseThrow(()-> new BadRequestException("Project Not Found!"));
+        return projectMapper.toProjectSummaryResponse(projectWithRole.getProject(),projectWithRole.getRole());
     }
 
 
